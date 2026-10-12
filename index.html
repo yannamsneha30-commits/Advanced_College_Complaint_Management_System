@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BET-T Portal — TKR College of Engineering And Technology</title>
+  <meta name="description" content="BET-T Grievance & Communication Portal — TKRCET, Hyderabad">
+
+  <!--
+    FILE STRUCTURE (keep all 4 files in the SAME folder):
+      index.html    ← this file
+      style.css     ← linked below
+      script.js     ← linked at bottom
+      backend.php   ← called by script.js via fetch()
+      database.sql  ← import into phpMyAdmin before running on server
+  -->
+
+  <!-- ✅ CSS linked here -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============================================================
+  PAGE: AUTH  (id="page-auth")
+  JS shows/hides pages using showPage('auth') and showPage('dash')
+============================================================ -->
+<div id="page-auth" class="page active">
+
+  <!-- College Header -->
+  <div class="auth-header">
+    <div class="logo-box">TKR</div>
+    <div class="ci">
+      <h1>TKR College of Engineering And Technology</h1>
+      <p>Meerpet, LB Nagar, Hyderabad &nbsp;|&nbsp; Affiliated to JNTUH &nbsp;|&nbsp; NAAC Accredited</p>
+    </div>
+  </div>
+
+  <!-- Info Strip -->
+  <div class="info-strip">
+    <strong>Founder Chairman:</strong> Sri Teegala Krishna Reddy &emsp;|&emsp;
+    <strong>Secretary:</strong> Dr. T. Harinath Reddy &emsp;|&emsp;
+    <strong>Treasurer:</strong> T. Amarnath Reddy &emsp;|&emsp;
+    <strong>Principal:</strong> Dr. D.V. Manohar Reddy
+  </div>
+
+  <!-- Auth Card -->
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="portal-tag">TKRCET &mdash; BET-T Portal</div>
+      <h2>Welcome</h2>
+      <p class="sub">Institutional Grievance &amp; Communication Portal</p>
+
+      <!-- Tab Switch -->
+      <div class="tab-sw">
+        <button id="tl" class="active" onclick="switchTab('login')">Login</button>
+        <button id="tr"               onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- ── LOGIN FORM ───────────────────────── -->
+      <div id="lf">
+        <div class="fg">
+          <label>Username</label>
+          <input type="text" id="l-user"
+            placeholder="e.g. 24K91A6701@tkrcet.ac.in"
+            autocomplete="username">
+        </div>
+        <div class="fg">
+          <label>Password</label>
+          <input type="password" id="l-pass"
+            placeholder="Enter your password"
+            autocomplete="current-password">
+          <div class="ferr" id="l-err"></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">Login →</button>
+
+        <div style="text-align:center;margin-top:10px">
+          <button class="btn btn-outline btn-sm" onclick="demoLogin()">
+            🎯 Demo Login (Student)
+          </button>
+        </div>
+
+        <!-- Credentials tip box -->
+        <div class="cred-tip">
+          <strong>All accounts — default password: <code>tkrcet2024</code></strong><br>
+          Student &nbsp;&nbsp;&nbsp;&nbsp;: 24K91A6701@tkrcet.ac.in<br>
+          HOD CSD &nbsp;&nbsp;: HOD002@tkrcet.ac.in<br>
+          Principal &nbsp;: PRI001@tkrcet.ac.in<br>
+          AO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: AO001@tkrcet.ac.in<br>
+          Class Teacher: CT001@tkrcet.ac.in &nbsp;(CSD-D)
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ─────────────────────── -->
+      <div id="rf" style="display:none">
+
+        <!-- Role selector -->
+        <div class="fg">
+          <label>Select Your Role *</label>
+          <div class="role-grid">
+            <div class="rt" id="rt-student"      onclick="selRoleUI('student')">      <span class="ic">🎓</span>Student</div>
+            <div class="rt" id="rt-faculty"      onclick="selRoleUI('faculty')">      <span class="ic">📚</span>Faculty</div>
+            <div class="rt" id="rt-classteacher" onclick="selRoleUI('classteacher')"> <span class="ic">🏫</span>Class Teacher</div>
+            <div class="rt" id="rt-hod"          onclick="selRoleUI('hod')">          <span class="ic">🏛️</span>HOD</div>
+            <div class="rt" id="rt-ao"           onclick="selRoleUI('ao')">           <span class="ic">📋</span>Admin Officer</div>
+            <div class="rt" id="rt-principal"    onclick="selRoleUI('principal')">    <span class="ic">👑</span>Principal</div>
+          </div>
+        </div>
+
+        <div class="f2">
+          <div class="fg">
+            <label>Full Name *</label>
+            <input type="text" id="r-name" placeholder="Your full name">
+          </div>
+          <div class="fg">
+            <label>Roll / Employee No.</label>
+            <input type="text" id="r-empid" placeholder="24K91A6701">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Username * &nbsp;<small style="font-weight:400;text-transform:none;letter-spacing:0">(must end with @tkrcet.ac.in)</small></label>
+          <input type="text" id="r-user" placeholder="24K91A6701@tkrcet.ac.in">
+        </div>
+
+        <div class="f2">
+          <div class="fg">
+            <label>Department</label>
+            <select id="r-dept">
+              <option value="">Select dept.</option>
+              <option value="1">CSE — Computer Science &amp; Engineering</option>
+              <option value="2">CSD — Computer Science &amp; Data Science</option>
+              <option value="3">CSM — CS &amp; Machine Learning</option>
+              <option value="4">IT — Information Technology</option>
+              <option value="5">CIVIL — Civil Engineering</option>
+              <option value="6">ECE — Electronics &amp; Communication</option>
+              <option value="7">EEE — Electrical &amp; Electronics</option>
+              <option value="8">MECH — Mechanical Engineering</option>
+              <option value="9">MBA — Business Administration</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Section</label>
+            <select id="r-sect">
+              <option value="">—</option>
+              <option>A</option><option>B</option><option>C</option><option>D</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="f2">
+          <div class="fg">
+            <label>Year (Students)</label>
+            <select id="r-year">
+              <option value="">—</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Password *</label>
+            <input type="password" id="r-pass" placeholder="Min 6 characters">
+          </div>
+        </div>
+
+        <div class="ferr" id="r-err"></div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()" style="margin-top:4px">
+          Create Account →
+        </button>
+      </div>
+    </div>
+  </div><!-- /auth-wrap -->
+
+  <div style="text-align:center;padding:12px;font-size:11px;color:#6b7280;border-top:1px solid #e5e7eb">
+    &copy; 2024 TKR College of Engineering And Technology, Hyderabad &nbsp;|&nbsp;
+    BET-T Portal &nbsp;|&nbsp; CSD Department
+  </div>
+</div><!-- /page-auth -->
+
+
+<!-- ============================================================
+  PAGE: DASHBOARD  (id="page-dash")
+============================================================ -->
+<div id="page-dash" class="page">
+
+  <!-- ── TOPBAR ─────────────────────────────────── -->
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="lb">TKR</div>
+      <div>
+        <div class="bn">BET-T Portal</div>
+        <div class="bs">TKRCET &mdash; Hyderabad</div>
+      </div>
+    </div>
+
+    <div class="tb-right">
+      <span id="clock"></span>
+
+      <!-- Notification bell -->
+      <button class="ib" id="notif-btn" onclick="showNotifications()" title="Notifications">
+        🔔 <span class="dot" id="tb-nb" style="display:none">0</span>
+      </button>
+      <!-- Notification dropdown panel (positioned absolutely) -->
+      <div id="notif-panel"
+        style="position:absolute;top:58px;right:90px;z-index:300;display:none"></div>
+
+      <!-- Messages -->
+      <button class="ib" onclick="showSec('messages')" title="Messages">
+        💬 <span class="dot" id="tb-mb" style="display:none">0</span>
+      </button>
+
+      <!-- User chip -->
+      <div class="tb-user">
+        <div class="av" id="tb-av">?</div>
+        <div>
+          <div class="un" id="tb-name">—</div>
+          <div class="ur" id="tb-role">—</div>
+        </div>
+      </div>
+
+      <button class="btn btn-lo" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- ── MAIN LAYOUT ─────────────────────────────── -->
+  <div class="main-layout">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="s-lbl" style="margin-top:10px">Navigation</div>
+
+      <!-- nav-lk uses data-nav for JS to add/remove .active class -->
+      <div class="nav-lk active" data-nav="overview"   onclick="showSec('overview')">
+        <span class="ni">📊</span> Overview
+      </div>
+      <div class="nav-lk" data-nav="complaints" onclick="showSec('complaints')">
+        <span class="ni">📋</span> Complaints
+        <span class="nb" id="nav-badge" style="display:none">0</span>
+      </div>
+      <div class="nav-lk" data-nav="file"        onclick="showSec('file')">
+        <span class="ni">✍️</span> File Complaint
+      </div>
+      <div class="nav-lk" data-nav="messages"    onclick="showSec('messages')">
+        <span class="ni">💬</span> Messages
+      </div>
+
+      <hr class="sd">
+      <div class="s-lbl">Tools</div>
+
+      <div class="nav-lk" data-nav="escalation" onclick="showSec('escalation')">
+        <span class="ni">🔺</span> Escalation
+      </div>
+      <div class="nav-lk" data-nav="reports"    onclick="showSec('reports')">
+        <span class="ni">📈</span> Reports
+      </div>
+      <!-- Only shown to HOD / AO / Principal (set by JS) -->
+      <div class="nav-lk" id="nav-admin" data-nav="admin"
+        style="display:none" onclick="showSec('admin')">
+        <span class="ni">⚙️</span> Admin Panel
+      </div>
+
+      <hr class="sd">
+      <div class="sidebar-info">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:6px">Quick Info</div>
+        <div>👑 Principal: Dr. D.V. Manohar Reddy</div>
+        <div>📋 AO: G. L. N. Reddy</div>
+        <div>🏛 HOD CSD: Dr. V. Krishna</div>
+        <div>🏛 Dean: Dr. A. Suresh Rao</div>
+        <div>🏫 CT CSD-D: CH. Gayathri</div>
+      </div>
+    </nav><!-- /sidebar -->
+
+    <!-- CONTENT AREA -->
+    <main class="content">
+
+      <!-- ══ OVERVIEW (data-sec="overview") ══════════════════ -->
+      <div data-sec="overview">
+        <div class="sec-hdr">
+          <div class="sec-title">Dashboard Overview</div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats">
+          <div class="sc blue">  <div class="sn" id="s-total">0</div><div class="sl">Total Complaints</div></div>
+          <div class="sc amber"> <div class="sn" id="s-open">0</div> <div class="sl">Open / Pending</div></div>
+          <div class="sc purple"><div class="sn" id="s-prog">0</div> <div class="sl">In Progress</div></div>
+          <div class="sc green"> <div class="sn" id="s-res">0</div>  <div class="sl">Resolved</div></div>
+          <div class="sc red">   <div class="sn" id="s-crit">0</div> <div class="sl">Critical</div></div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="ct">📂 By Category</div>
+            <div class="bar-list" id="chart-cat">
+              <div style="color:var(--text3);font-size:12px">Loading…</div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="ct">🎯 By Priority</div>
+            <div class="bar-list" id="chart-pri"></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="ct">📊 Status Distribution</div>
+            <div class="donut-wrap">
+              <div id="donut-svg"></div>
+              <div class="donut-center">
+                <div class="dn" id="donut-n">0</div>
+                <div class="ds">Total</div>
+              </div>
+            </div>
+            <div class="leg-grid" id="donut-leg"></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="ct">✅ Resolution Rate</div>
+            <div class="rate-big" id="rate-big">0%</div>
+            <div style="font-size:11px;color:var(--text2);text-align:center;margin-bottom:10px">
+              Complaints resolved
+            </div>
+            <div class="prog-trk">
+              <div class="prog-fl" id="rate-fl" style="width:0%"></div>
+            </div>
+            <div class="prog-lbs"><span>0%</span><span>Target: 80%</span><span>100%</span></div>
+          </div>
+        </div>
+
+        <!-- Recent Complaints -->
+        <div class="sec-hdr">
+          <div class="sec-title">Recent Complaints</div>
+          <button class="btn btn-outline btn-sm" onclick="showSec('complaints')">View All</button>
+        </div>
+        <div class="clist" id="recent-list">
+          <div style="color:var(--text3);font-size:12px;padding:20px">Loading…</div>
+        </div>
+      </div><!-- /overview -->
+
+
+      <!-- ══ COMPLAINTS (data-sec="complaints") ══════════════ -->
+      <div data-sec="complaints">
+        <div class="sec-hdr">
+          <div class="sec-title">All Complaints</div>
+          <button class="btn btn-primary btn-sm" onclick="showSec('file')">+ File Complaint</button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="fb active" onclick="filterBy('all',this)">All</button>
+          <button class="fb" onclick="filterBy('open',this)">Open</button>
+          <button class="fb" onclick="filterBy('in_progress',this)">In Progress</button>
+          <button class="fb" onclick="filterBy('resolved',this)">Resolved</button>
+          <button class="fb" onclick="filterBy('escalated',this)">Escalated</button>
+          <button class="fb" onclick="filterBy('critical',this)">🔴 Critical</button>
+          <button class="fb" onclick="filterBy('overdue',this)">⏱ Overdue</button>
+          <div class="search-w">
+            <input type="text" id="search-inp"
+              placeholder="Search complaints…"
+              oninput="renderComplaints()">
+          </div>
+        </div>
+
+        <div class="clist" id="clist">
+          <div style="color:var(--text3);font-size:12px;padding:20px">Loading…</div>
+        </div>
+      </div><!-- /complaints -->
+
+
+      <!-- ══ FILE COMPLAINT (data-sec="file") ════════════════ -->
+      <div data-sec="file">
+        <div class="sec-hdr"><div class="sec-title">File a Complaint</div></div>
+
+        <div class="notice info" style="margin-bottom:18px">
+          ℹ️ All complaints are recorded and tracked.
+          🤖 <strong>AI Smart Category</strong> will auto-detect the category from your description.
+        </div>
+
+        <div style="max-width:620px">
+
+          <div class="fg">
+            <label>Complaint Title *</label>
+            <input type="text" id="f-title"
+              placeholder="Brief, clear title for your complaint" maxlength="200">
+          </div>
+
+          <div class="f2">
+            <div class="fg">
+              <label>Category *</label>
+              <select id="f-cat">
+                <option>Academic Issue</option>
+                <option>Faculty Conduct</option>
+                <option>Infrastructure</option>
+                <option>Administrative</option>
+                <option>Harassment</option>
+                <option>Examination</option>
+                <option>Library / Lab</option>
+                <option>Attendance</option>
+                <option>Fee Related</option>
+                <option>Facility</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Against (Optional)</label>
+              <select id="f-against">
+                <option value="">None / Not applicable</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Priority -->
+          <div class="fg">
+            <label>Priority Level *</label>
+            <div class="pri-grid">
+              <div class="pt"          id="pt-low"      onclick="selPriUI('low')">      <span class="ic">🟢</span>LOW</div>
+              <div class="pt sel-medium" id="pt-medium" onclick="selPriUI('medium')">  <span class="ic">🔵</span>MEDIUM</div>
+              <div class="pt"          id="pt-high"     onclick="selPriUI('high')">     <span class="ic">🟡</span>HIGH</div>
+              <div class="pt"          id="pt-critical" onclick="selPriUI('critical')"> <span class="ic">🔴</span>CRITICAL</div>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Detailed Description * &nbsp;<small style="font-weight:400;text-transform:none;letter-spacing:0">(minimum 20 characters)</small></label>
+            <textarea id="f-desc"
+              placeholder="Describe your issue clearly. Include dates, times, and relevant details. Be factual and precise."
+              maxlength="2000"
+              oninput="updChar()"></textarea>
+            <div class="char-ct" id="char-ct">0 / 2000</div>
+          </div>
+
+          <div class="f2">
+            <div class="fg">
+              <label>Assign To</label>
+              <select id="f-assignee">
+                <option value="">Auto-assign by hierarchy</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Expected Resolution</label>
+              <select id="f-dead">
+                <option value="3">3 days (Urgent)</option>
+                <option value="7" selected>7 days (Standard)</option>
+                <option value="14">14 days (Normal)</option>
+                <option value="30">30 days (Complex)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Attachment &nbsp;<small style="font-weight:400;text-transform:none;letter-spacing:0">(Optional — JPG, PNG, PDF, max 3MB)</small></label>
+            <input type="file" id="f-attach" accept="image/*,.pdf"
+              style="font-size:12px;padding:6px">
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">
+              📎 Attach a photo or document as evidence (optional)
+            </div>
+          </div>
+
+          <div style="display:flex;gap:9px;margin-top:6px">
+            <button class="btn btn-primary" onclick="submitComplaint()">Submit Complaint →</button>
+            <button class="btn btn-outline" onclick="showSec('complaints')">Cancel</button>
+          </div>
+        </div>
+      </div><!-- /file -->
+
+
+      <!-- ══ MESSAGES (data-sec="messages") ══════════════════ -->
+      <div data-sec="messages">
+        <div class="sec-hdr">
+          <div class="sec-title">Private Messages</div>
+          <span style="font-size:11px;color:var(--text2)">🔒 Private &amp; Confidential</span>
+        </div>
+        <div class="notice info" style="margin-bottom:12px;font-size:11px">
+          🔒 Messages are private — only you and the recipient can view the conversation.
+        </div>
+
+        <div class="msg-layout">
+          <!-- Conversation list -->
+          <div class="msg-sb">
+            <div class="msg-sh">
+              <input type="text" placeholder="Search contacts…">
+            </div>
+            <div class="conv-list" id="conv-list">
+              <div style="padding:18px;text-align:center;font-size:12px;color:var(--text3)">
+                Loading…
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat area -->
+          <div style="display:flex;flex-direction:column;flex:1">
+            <div class="msg-topb">
+              <div style="font-size:20px">💬</div>
+              <div>
+                <div class="mn" id="msg-cname">Select a conversation</div>
+                <div class="mr" id="msg-crole">Choose someone to message privately</div>
+              </div>
+              <div class="online-d" id="msg-onl" style="display:none"></div>
+            </div>
+
+            <div class="msg-body" id="msg-body">
+              <div class="empty">
+                <div class="ei">💬</div>
+                <h3>No Conversation Selected</h3>
+                <p>Pick a contact from the left or start a new private message.</p>
+              </div>
+            </div>
+
+            <div class="msg-compose" id="msg-inp-row" style="display:none">
+              <input type="text" id="msg-inp" placeholder="Type a private message…">
+              <button class="btn btn-primary btn-sm" onclick="sendMsg()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /messages -->
+
+
+      <!-- ══ ESCALATION (data-sec="escalation") ══════════════ -->
+      <div data-sec="escalation">
+        <div class="sec-hdr"><div class="sec-title">Escalation Hierarchy</div></div>
+
+        <div class="notice warning" style="margin-bottom:16px">
+          ⚠️ Escalate only when your complaint has not been addressed within its deadline.
+          The system <strong>auto-escalates</strong> overdue complaints automatically.
+        </div>
+
+        <!-- TKRCET authority quick reference -->
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--rlg);padding:14px;margin-bottom:16px">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:10px;font-size:13px">
+            🏛 TKRCET — Full Authority Structure
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;font-size:11px;color:var(--text2)">
+            <div>👑 <strong>Principal:</strong> Dr. D.V. Manohar Reddy</div>
+            <div>📋 <strong>Dean Academics:</strong> Dr. A. Suresh Rao</div>
+            <div>📋 <strong>Admin Officer:</strong> G. L. N. Reddy</div>
+            <div>🏛 <strong>HOD CSE:</strong> Dr. A. Suresh Rao</div>
+            <div>🏛 <strong>HOD CSD:</strong> Dr. V. Krishna</div>
+            <div>🏛 <strong>HOD CSM:</strong> Mrs. Jayalaxmi C</div>
+            <div>🏛 <strong>HOD IT:</strong> Dr. Satya Narayana</div>
+            <div>🏛 <strong>HOD Civil:</strong> KVR Satya Sai</div>
+            <div>🏛 <strong>HOD ECE:</strong> M. Mahesh</div>
+            <div>🏛 <strong>HOD EEE:</strong> K. Raju</div>
+            <div>🏛 <strong>HOD Mech:</strong> D.V. Ravi Dhankar</div>
+            <div>🏫 <strong>CT CSD-A:</strong> C. Jyothi</div>
+            <div>🏫 <strong>CT CSD-B:</strong> B. Tejaswini</div>
+            <div>🏫 <strong>CT CSD-C:</strong> K. Uma Bharathi</div>
+            <div>🏫 <strong>CT CSD-D:</strong> CH. Gayathri</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">
+          Your Escalation Path
+        </div>
+        <div class="esc-tree" id="esc-tree">
+          <div style="color:var(--text3);font-size:12px">Loading…</div>
+        </div>
+
+        <div class="notice info" style="margin-top:14px;font-size:11px">
+          ℹ️ To escalate a specific complaint:
+          <strong>Complaints → Open it → Click "Escalate"</strong>
+        </div>
+      </div><!-- /escalation -->
+
+
+      <!-- ══ REPORTS (data-sec="reports") ════════════════════ -->
+      <div data-sec="reports">
+        <div class="sec-hdr"><div class="sec-title">Reports &amp; Analytics</div></div>
+        <div id="report-body">
+          <div style="color:var(--text3);font-size:12px;padding:20px">Loading…</div>
+        </div>
+      </div><!-- /reports -->
+
+
+      <!-- ══ ADMIN PANEL (data-sec="admin") ══════════════════ -->
+      <div data-sec="admin">
+        <div class="sec-hdr"><div class="sec-title">Admin Panel</div></div>
+
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="showAdminTab('users',this)">Registered Users</button>
+          <button class="tab-btn"        onclick="showAdminTab('complaints',this)">All Complaints</button>
+          <button class="tab-btn"        onclick="showAdminTab('reports',this)">Export Reports</button>
+        </div>
+
+        <div id="admin-ct">
+          <div style="color:var(--text3);font-size:12px;padding:20px">Loading…</div>
+        </div>
+      </div><!-- /admin -->
+
+    </main><!-- /content -->
+  </div><!-- /main-layout -->
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:10px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);background:var(--white)">
+    &copy; 2024 TKR College of Engineering And Technology, Meerpet, LB Nagar, Hyderabad &nbsp;|&nbsp;
+    Founder Chairman: Sri Teegala Krishna Reddy &nbsp;|&nbsp; BET-T Portal
+  </div>
+</div><!-- /page-dash -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+  MODALS
+════════════════════════════════════════════════════════════ -->
+
+<!-- Complaint Detail Modal -->
+<div class="overlay" id="det-modal">
+  <div class="mbox" style="max-width:620px">
+    <button class="mclose" onclick="closeDet()">✕</button>
+    <div id="det-body"></div>
+  </div>
+</div>
+
+<!-- New Message Modal -->
+<div class="overlay" id="nm-modal">
+  <div class="mbox" style="max-width:390px">
+    <button class="mclose"
+      onclick="document.getElementById('nm-modal').classList.remove('open')">✕</button>
+    <div class="mhdr"><h3>New Private Message</h3></div>
+    <div class="mbody">
+      <div class="fg"><label>Send To</label><select id="nm-to"></select></div>
+      <div class="fg">
+        <label>Message</label>
+        <textarea id="nm-text" placeholder="Type your private message…"></textarea>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-outline btn-sm"
+        onclick="document.getElementById('nm-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="sendNewMsg()">Send →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toast-cnt"></div>
+
+<!-- ✅ JS linked here — MUST be at the end, after all HTML -->
+<script src="script.js"></script>
+
+</body>
+</html>
